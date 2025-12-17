@@ -21,6 +21,7 @@ class IsCreatorMiddleware
         }else{
             abort(403, 'Unauthorized');
         }
+        
         // if (!in_array(auth()->user()->role, [2, 3])) {
         //     abort(403, 'Unauthorized');
         // }
