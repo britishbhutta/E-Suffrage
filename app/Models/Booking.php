@@ -8,6 +8,7 @@ class Booking extends Model
 {
     protected $fillable = [
         'tariff_id',
+        'media_ad_id',
         'user_id',
         'email',
         'phone',
@@ -27,6 +28,8 @@ class Booking extends Model
         'payment_method',
         'is_completed',
         'booking_status',
+        'invoice_issue',
+        'remember_me',
     ];
 
     public function user()
@@ -45,5 +48,9 @@ class Booking extends Model
     public function reward()
     {
         return $this->hasOne(Reward::class, 'booking_id', 'id');
+    }
+    public function votingEvent()
+    {
+        return $this->hasOne(VotingEvent::class, 'booking_id', 'id');
     }
 }

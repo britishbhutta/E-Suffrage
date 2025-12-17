@@ -5,14 +5,16 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, SoftDeletes;
 
     // role constants (match your migration: 1 = Voter, 2 = Creator)
     public const ROLE_VOTER = 1;
     public const ROLE_CREATOR = 2;
+    public const ROLE_CREATOR_MEDIA_AD = 3;
 
     protected $fillable = [
         'first_name',
@@ -43,6 +45,15 @@ class User extends Authenticatable
         'email_verification_expires_at' => 'datetime',
         'role' => 'integer',
     ];
+
+    protected $dates = [
+        'deleted_at',
+    ];
+
+    public function activityLogs()
+    {
+        return $this->hasMany(ActivityLog::class, 'user_id','id');
+    }
 
     public function booking()
     {

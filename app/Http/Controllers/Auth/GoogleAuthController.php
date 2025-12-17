@@ -23,7 +23,9 @@ class GoogleAuthController extends Controller
         $roleParam = $request->query('role', null);
         if ($roleParam === 'creator') {
             session(['signup_role' => User::ROLE_CREATOR]);
-        } else {
+        }elseif($roleParam === 'creator-media-ad'){
+            session(['signup_role' => User::ROLE_CREATOR_MEDIA_AD]);
+        }else {
             session(['signup_role' => User::ROLE_VOTER]);
         }
 
@@ -44,7 +46,7 @@ class GoogleAuthController extends Controller
             if (! $googleUser || ! $googleUser->getEmail()) {
                 return redirect()->route('login')->with('error', 'No email returned from Google.');
             }
-
+            
             $email = strtolower($googleUser->getEmail());
 
             $roleInt = session('signup_role');
@@ -64,12 +66,20 @@ class GoogleAuthController extends Controller
             if (!$user) {
                 $user = User::create(array_merge(['email' => $email], $data));
             }
-
+            
             // Clear role from session
             session()->forget('signup_role');
-
+            
             // Log user in
             Auth::login($user, true);
+            // save logs
+            $userId = Auth::id();
+            $userName = Auth::user()->first_name .' '. Auth::user()->last_name;
+            $userRole = Auth::user()->role == 1 ? 'Voter' : 'Creator';
+            $description = $userName . ' Logged In Successfully as ' . $userRole;
+            $action = 'Logged In';
+            $module = 'Google Authentication';
+            activityLog($userId, $description,$action,$module);
             return redirect()->intended(route('dashboard'));
         } catch (\Throwable $e) {
             Log::error('Google login error: ' . $e->getMessage(), ['trace' => $e->getTraceAsString()]);

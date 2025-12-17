@@ -6,6 +6,12 @@
     @endpush
 
     @php
+        if (session()->has('eventToken')) {
+            session()->forget('eventToken');
+        }
+        if (session()->has('votingEvent')) {
+            session()->forget('votingEvent');
+        }
         // role names used by your app: 'voter' and 'creator'
         $firstRole = 'voter';
         $secondRole = 'creator';
@@ -55,11 +61,18 @@
                             </div>
                         </label>
                     </div>
+                    <div class="d-flex flex-column align-items-center mt-4">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="termsCheckboxJoin">
+                            <label class="form-check-label" for="termsCheckboxJoin">
+                                <b>I agree to the <a href="{{ route('t&cJoineVoting') }}" target="_blank">Terms & Conditions</a></b>
+                            </label>
+                        </div>
 
-                    <div class="text-center mt-4">
-                        {{-- Primary join button — JS will update href based on selection --}}
-                        <a id="joinBtn" href="{{ route('register', ['role' => $firstRole]) }}" class="btn btn-success btn-join px-4 py-2">
-                            Join as a {{ ucfirst($firstRole) }}
+                        <a id="joinBtn" 
+                        href="{{ route('register', ['role' => $firstRole]) }}" 
+                        class="btn btn-success btn-join px-4 py-2">
+                        Join as a {{ ucfirst($firstRole) }}
                         </a>
                     </div>
                     <br>
@@ -73,48 +86,65 @@
     </div>
 
     @push('scripts')
-    <script>
-        (function () {
-            // Elements
-            const cards = document.querySelectorAll('.role-card');
-            const joinBtn = document.getElementById('joinBtn');
-            const googleBtn = document.getElementById('googleBtn');
-            const registerBase = "{{ route('register') }}";
-            const googleBase = "{{ route('google.login') }}";
+        <script>
+            (function () {
+                // Elements
+                const cards = document.querySelectorAll('.role-card');
+                const joinBtn = document.getElementById('joinBtn');
+                const googleBtn = document.getElementById('googleBtn');
+                const registerBase = "{{ route('register') }}";
+                const googleBase = "{{ route('google.login') }}";
 
-            function setActiveRole(role) {
-                // Visual: mark selected
+                function setActiveRole(role) {
+                    // Visual: mark selected
+                    cards.forEach(c => {
+                        if (c.dataset.role === role) c.classList.add('selected');
+                        else c.classList.remove('selected');
+                        // set radio input
+                        const input = c.querySelector('input[type="radio"]');
+                        if (input) input.checked = (c.dataset.role === role);
+                    });
+
+                    // Update primary button href and label
+                    joinBtn.href = registerBase + '?role=' + encodeURIComponent(role);
+                    joinBtn.textContent = 'Join as a ' + (role === 'creator' ? 'Creator' : 'Voter');
+
+                    // Update google btn (preserve role)
+                    googleBtn.href = googleBase + '?role=' + encodeURIComponent(role);
+                }
+
+                // Wire up clicks & keyboard
                 cards.forEach(c => {
-                    if (c.dataset.role === role) c.classList.add('selected');
-                    else c.classList.remove('selected');
-                    // set radio input
-                    const input = c.querySelector('input[type="radio"]');
-                    if (input) input.checked = (c.dataset.role === role);
+                    c.addEventListener('click', () => setActiveRole(c.dataset.role));
+                    c.addEventListener('keydown', (e) => {
+                        if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setActiveRole(c.dataset.role);
+                        }
+                    });
                 });
 
-                // Update primary button href and label
-                joinBtn.href = registerBase + '?role=' + encodeURIComponent(role);
-                joinBtn.textContent = 'Join as a ' + (role === 'creator' ? 'Creator' : 'Voter');
+                // initial state
+                const initial = document.querySelector('.role-card.selected')?.dataset.role || 'voter';
+                setActiveRole(initial);
+            })();
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const checkbox = document.getElementById("termsCheckboxJoin");
+                const joinBtn  = document.getElementById("joinBtn");
+                joinBtn.classList.add("disabled");
 
-                // Update google btn (preserve role)
-                googleBtn.href = googleBase + '?role=' + encodeURIComponent(role);
-            }
-
-            // Wire up clicks & keyboard
-            cards.forEach(c => {
-                c.addEventListener('click', () => setActiveRole(c.dataset.role));
-                c.addEventListener('keydown', (e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                        e.preventDefault();
-                        setActiveRole(c.dataset.role);
+                checkbox.addEventListener("change", function () {
+                    if (this.checked) {
+                        joinBtn.classList.remove("disabled");
+                        joinBtn.removeAttribute("aria-disabled");
+                    } else {
+                        joinBtn.classList.add("disabled");
+                        joinBtn.setAttribute("aria-disabled", "true");
                     }
                 });
             });
-
-            // initial state
-            const initial = document.querySelector('.role-card.selected')?.dataset.role || 'voter';
-            setActiveRole(initial);
-        })();
-    </script>
+        </script>
     @endpush
 </x-guest-layout>

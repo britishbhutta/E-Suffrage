@@ -2,11 +2,32 @@
 <x-app-layout>
     @push('styles')
         <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+        <style>
+            body { background-color: #f8f9fa; }
+            .voting-card { max-width: 600px; margin: 2rem auto; }
+            .voting-header { background: linear-gradient(135deg, #353e67 0%, #353e67 100%); color: white; }
+            .success-icon { font-size: 4rem; color: #353e67; }
+        </style>
     @endpush
+    @if(session('error'))
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                Toastify({
+                    text: "{{ session('error') }}",
+                    duration: 3000, // 5 seconds
+                    gravity: "top", // `top` or `bottom`
+                    position: "right", // `left`, `center` or `right`
+                    backgroundColor: "linear-gradient(to right, #ff5f6d, #ffc371)", // red/orange for error
+                    stopOnFocus: true, // pause on hover
+                    close: true
+                }).showToast();
+            });
+        </script>
+    @endif
+
 
     <div class="container py-4">
         @include('partials.voting-tabs')
-
         <div class="card">
             <div class="card-body text-center">
                 @if($bookings->isEmpty())
@@ -21,10 +42,13 @@
                                 <tr>
                                 <th>Date</th>
                                 <th>Name of voting form</th>
-                                <th>Vote Cast</th>
+                                <th>Vote Casted</th>
                                 <th>Results (%)</th>
                                 <th>File with email</th>
-                                <th>Tariff</th>
+                                <th>Reward</th>
+                                @if(auth()->user()->role != 3)
+                                    <th>Tariff</th>
+                                @endif
                                 <th>QR</th>
                                 <th>Status</th>
                                 </tr>
@@ -38,9 +62,17 @@
                                             $purchasedTariff = \App\Models\PurchasedTariff::where('booking_id', $booking->id)->first();
                                             $options = $votingEvent ? \App\Models\VotingEventOption::where('voting_event_id', $votingEvent->id)->get() : collect();
                                             $totalVotes = (int) ($purchasedTariff->total_votes ?? 0);
+                                            $voteCount = null;
+                                            if($booking->media_ad_id && $votingEvent){
+                                                $voteCount = \App\Models\VotingEventVote::where('voting_event_id', $votingEvent->id)->count();
+                                            }
                                         @endphp
                                         <td>{{ $votingEvent?->title ?? '-' }}</td>
-                                        <td>{{ $purchasedTariff?->votes_count ?? 0 }}</td>
+                                        @if($booking->media_ad_id)
+                                            <td>{{ $voteCount ?? '-' }}</td>
+                                        @else
+                                            <td>{{ $purchasedTariff?->votes_count ?? 0 }}</td>
+                                        @endif
                                         <td>
                                             @if($options->isNotEmpty())
                                                 @php
@@ -64,10 +96,34 @@
                                                 -
                                             @endif
                                         </td>
-                                        <td>-</td>
-                                        <td>{{ $booking->tariff->title }}</td>
+                                        
                                         <td>
-                                            @if($votingEvent)
+                                            @if($votingEvent != null)
+                                                <a href="{{ route('voting.event.emails',[$votingEvent->id]) }}">Emails.CSV</a>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td>
+                                            @if(!empty($booking->reward?->name))
+                                                <a href="#"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#rewardDetail"
+                                                    data-name="{{ $booking->reward->name }}"
+                                                    data-description="{{ $booking->reward->description }}"
+                                                    data-image="{{ $booking->reward->image }}"
+                                                >
+                                                {{ $booking->reward->name }} 
+                                                </a>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        @if(auth()->user()->role != 3)
+                                            <td>{{ optional($booking->tariff)->title ?? '-' }}</td>
+                                        @endif
+                                        <td>
+                                            @if($votingEvent && $booking->booking_status === 'Completed')
                                                 @php $publicUrl = route('voting.public', ['token' => $votingEvent->token]); @endphp
                                                 <button type="button"
                                                         class="btn btn-outline-secondary btn-sm open-qr-modal"
@@ -85,14 +141,51 @@
                                             <td>Completed</td>
                                         @else
                                             <td>
-                                                <form action="{{ route('voting.set', $booking->id) }}" method="POST">
+                                                <form action="{{ route('incomplete.voting.form', $booking->id) }}" method="POST">
                                                     @csrf
-                                                    <button type="submit" class="btn btn-primary btn-sm">Incomplete</button>
+                                                    <button type="submit" class="btn btn-primary btn-sm btn-blue">Incomplete</button>
                                                 </form>
                                             </td>
                                         @endif
                                     </tr>
                                 @endforeach
+                                <!-- Reward Modal -->
+                                <div class="modal fade" id="rewardDetail" tabindex="-1" aria-hidden="true">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="container">
+                                                <div class="modal-header">
+                                                </div>
+                                                
+                                                <div class="modal-body">
+                                                    <div class="voting-card">
+                                                        <div class="card voting-header">
+                                                            <div class="card-body text-center">
+                                                                <h2 class="card-title mb-2">Reward</h2>
+                                                                <h2 class="card-title mb-2"><span id="modal-name"></span></h2>
+                                                                
+                                                            </div>
+                                                        </div>
+
+                                                        <div class="card mt-3">
+                                                            <div class="card-body text-center">
+                                                                <div class="mb-4">
+                                                                    <p class="card-text mb-4"><span id="modal-description"></span></p>
+                                                                    <p class="card-text mb-0">
+                                                                        <a id="modal-download-link" href="#" download title="Click on image to download the Reward">
+                                                                            <img id="modal-image" src="" alt="Vote image" style="max-width: 100%; height: auto;">
+                                                                        </a>
+                                                                    </p>
+                                                                    <p class="card-text mb-4">Click on Image to download</p>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
                             </tbody>
                             </table>
                         </div>
@@ -101,6 +194,35 @@
             </div>
         </div>
     </div>
+@push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const rewardModal = document.getElementById('rewardDetail');
+            rewardModal.addEventListener('show.bs.modal', function (event) {
+                let button = event.relatedTarget;
+
+                // Get data attributes
+                let name = button.getAttribute('data-name');
+                let description = button.getAttribute('data-description');
+                let image = button.getAttribute('data-image');
+                
+                // Insert into modal
+                document.getElementById('modal-name').textContent = name;
+                document.getElementById('modal-description').textContent = description;
+                
+
+                // Set image path
+                const imagePath = "{{ asset('/') }}storage/" + image;  // your image path
+                document.getElementById('modal-image').src = imagePath;
+
+                // Make it downloadable
+                const downloadLink = document.getElementById('modal-download-link');
+                downloadLink.href = imagePath;
+                downloadLink.download = "reward.png"; // you can set default filename
+            });
+        });
+    </script>
+@endpush
 </x-app-layout>
 
 {{-- QR Modal --}}
@@ -120,7 +242,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-light" data-bs-dismiss="modal">Close</button>
-                <a id="downloadQrBtn" class="btn btn-primary" download="voting-qr.png">Download PNG</a>
+                <a id="downloadQrBtn" class="btn btn-blue" download="voting-qr.png">Download PNG</a>
             </div>
         </div>
     </div>

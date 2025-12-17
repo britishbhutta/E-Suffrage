@@ -3,7 +3,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="{{ asset('css/auth.css') }}" rel="stylesheet">
     @endpush
-
+            
     <div class="container form-card">
         <div class="card shadow-sm">
             <div class="card-body">
@@ -27,7 +27,7 @@
 
                 <p class="small text-muted">
                     We sent a 6-digit verification code to your email. Enter it here to activate your account.
-                    <br><strong>The code will expire in 2 minutes.</strong>
+                    <br><strong>The code will expire in 5 minutes.</strong>
                 </p>
 
                 <form method="POST" action="{{ route('verification.verify') }}">
@@ -46,7 +46,7 @@
                     </div>
 
                     <div class="d-grid mb-2">
-                        <button type="submit" class="btn btn-primary">Verify</button>
+                        <button type="submit" class="btn btn-blue">Verify</button>
                     </div>
                 </form>
 

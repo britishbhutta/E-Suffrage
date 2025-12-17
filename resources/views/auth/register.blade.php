@@ -3,6 +3,11 @@
     @push('styles')
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <link href="{{ asset('css/auth.css') }}" rel="stylesheet">
+        <!-- <style>
+            body { background-color: #f8f9fa; }
+            .voting-card { max-width: 600px; margin: 2rem auto; }
+            .voting-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+        </style> -->
     @endpush
 
     @php
@@ -15,13 +20,23 @@
             $selectedRole = ((int)$selectedRole === \App\Models\User::ROLE_CREATOR) ? 'creator' : 'voter';
         }
     @endphp
-
+    
     <div class="container form-card form-compact">
         <div class="text-center mb-3">
             <h1 class="fw-bold">Sign up</h1>
-            <div class="small text-muted">Signing up as <strong>{{ ucfirst($selectedRole) }}</strong></div>
+            <div class="small text-muted">Signing up as <strong>{{ ucwords(str_replace('-', ' ', $selectedRole)) }} </strong></div>
         </div>
-
+        <!-- @if(session()->has('votingEvent'))
+            <div class="container">
+                <div class="voting-card">
+                    <div class="card voting-header mb-3">
+                        <div class="card-body text-center">
+                            <h2 class="card-title mb-2">{{ session('votingEvent') }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif -->
         <div class="card shadow-sm border-0">
             <div class="card-body">
                 <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3 mb-3">
@@ -118,8 +133,15 @@
                         @enderror
                     </div>
 
-                    <div class="text-center mt-5 mb-2">
-                        <button type="submit" class="btn-create">Create my account</button>
+                    <div class="d-flex flex-column align-items-center mt-5 mb-2">
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="termsCheckboxRegistration">
+                            <label class="form-check-label" for="termsCheckboxRegistration">
+                                <b>Registration Conditions For {{ ucwords(str_replace('-', ' ', $selectedRole)) }}</b>
+                                <!-- <b>I agree to the <a href="{{ route('t&cRegistration') }}" target="_blank"  >Terms & Conditions{{ $selectedRole }}</a></b> -->
+                            </label>
+                        </div>
+                        <button type="submit" class="btn-create" id="btnRegistration">Create my account</button>
                     </div>
 
                     <div class="text-center">
@@ -148,6 +170,18 @@
                     });
                 }
             })();
+        </script>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                const checkbox = document.getElementById("termsCheckboxRegistration");
+                const registerBtn = document.getElementById("btnRegistration");
+
+                registerBtn.disabled = true;
+
+                checkbox.addEventListener("change", function () {
+                    registerBtn.disabled = !this.checked;
+                });
+            });
         </script>
     @endpush
 </x-guest-layout>

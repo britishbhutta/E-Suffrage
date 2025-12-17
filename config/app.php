@@ -2,6 +2,7 @@
 
 return [
 
+    'setup_completed' => env('APP_SETUP_COMPLETED', false),
     /*
     |--------------------------------------------------------------------------
     | Application Name

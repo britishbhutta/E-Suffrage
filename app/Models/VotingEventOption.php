@@ -17,4 +17,9 @@ class VotingEventOption extends Model
     {
         return $this->belongsTo(VotingEvent::class);
     }
+
+    public function votes()
+    {
+        return $this->hasMany(VotingEventVote::class);
+    }
 }

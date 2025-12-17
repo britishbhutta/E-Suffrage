@@ -16,6 +16,7 @@
         <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
         <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/toastify-js/src/toastify.min.css">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
         <!-- Page-specific styles pushed from child views -->
         @stack('styles')
@@ -25,6 +26,11 @@
             body { font-family: "Figtree", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial; margin:0; }
             .min-h-screen { min-height: 100vh; }
             .bg-gray-100 { background: #f3f4f6; }
+            .evoting-logo{
+                height: 70px;  
+                width: auto;    
+                max-width: 200px; 
+            }
         </style>
     </head>
     <body>
@@ -45,6 +51,10 @@
             <main class="container my-4">
                 {{ $slot }}
             </main>
+            @if(auth()->check() && auth()->user()->role == '1' &&
+               !in_array(Route::currentRouteName(), ['voterHistory']) )
+                @include('layouts.footer')
+            @endif
         </div>
 
         <!-- Bootstrap JS (optional) -->

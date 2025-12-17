@@ -13,13 +13,17 @@ class IsCreatorMiddleware
      *
      * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
      */
-    public function handle(Request $request, Closure $next, string $role): Response
+    public function handle(Request $request, Closure $next, string $roles): Response
     {   
         $user = auth()->user();
-        if ($user && $user->role == $role) {
-            
+        if($user->role == $roles){
             return $next($request);
+        }else{
+            abort(403, 'Unauthorized');
         }
-        return redirect()->back();
+        // if (!in_array(auth()->user()->role, [2, 3])) {
+        //     abort(403, 'Unauthorized');
+        // }
+        // return $next($request);
     }
 }

@@ -1,18 +1,16 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Voting Ended - {{ $votingEvent->title }}</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body { background-color: #f8f9fa; }
-        .voting-card { max-width: 600px; margin: 2rem auto; }
-        .voting-header { background: linear-gradient(135deg, #6c757d 0%, #495057 100%); color: white; }
-    </style>
-</head>
-<body>
+<x-app-layout> 
+    @push('styles')
+        <style>
+            body { background-color: #f8f9fa; }
+            .voting-card { max-width: 600px; margin: 2rem auto; }
+            .voting-header { background: linear-gradient(135deg, #353e67 0%, #353e67 100%); color: white; }
+        </style>
+    @endpush
     <div class="container">
+        <div class="text-center">
+                <span class="fw-bold fs-5">Voting Form - Reward</span>
+                <span class="fw-bold fs-5">" {{ $reward->name }} "</span>
+            </div>
         <div class="voting-card">
             <div class="card voting-header">
                 <div class="card-body text-center">
@@ -29,7 +27,15 @@
                         <p class="text-muted">This voting event ended on:</p>
                         <h5 class="text-secondary">{{ \Carbon\Carbon::parse($votingEvent->end_at)->format('M d, Y \a\t H:i') }}</h5>
                     </div>
-                    
+                    @if(!Auth::check())
+                            <div class="mt-4 text-center mb-4">
+                                <a href="{{ route('login') }}" class="fw-bold text-decoration-none text-primary">
+                                    Join The Voting
+                                    &nbsp; | &nbsp;
+                                    Log In or Register
+                                </a>
+                            </div>
+                        @endif
                     <div class="alert alert-secondary">
                         <strong>Voting Period:</strong><br>
                         @if($votingEvent->start_at)
@@ -41,5 +47,5 @@
             </div>
         </div>
     </div>
-</body>
-</html>
+</x-app-layout> 
+
