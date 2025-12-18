@@ -37,10 +37,10 @@ Route::get('/setup/complete', function(){return view('setup.complete');});
 Route::post('/setup/create-database', [SetupController::class, 'createDatabase'])->name('setup.createDatabase');
 
 // Root: role chooser page (public)
-Route::get('/', [DashboardController::class,'index'])->name('home');
+
 
 Route::middleware(['setup'])->group(function () {
-
+    Route::get('/', [DashboardController::class,'index'])->name('home');
     Route::get('/join', function () {
         return view('auth.choose-role');
     })->name('join');

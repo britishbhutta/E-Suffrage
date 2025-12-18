@@ -12,11 +12,11 @@ class DashboardController extends Controller
 {
     public function index(){
         
-        $setupCompleted = config('app.setup_completed');
-        if($setupCompleted === false){
-            return redirect('/setup');
-        }
-        return view('front-end.index');
+        // $setupCompleted = config('app.setup_completed');
+        // if($setupCompleted === false){
+        //     return redirect('/setup');
+        // }
+        return redirect()->route('join');
     }
     public function redirect(){
         
