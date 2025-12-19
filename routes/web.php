@@ -21,6 +21,7 @@ use App\Http\Controllers\Admin\CreaterController;
 use App\Http\Controllers\Admin\VoterController;
 use App\Http\Controllers\Admin\AdminProfileController;
 use App\Http\Controllers\Admin\TariffController;
+use App\Http\Controllers\Admin\ActivityLogController;
 
 /*
 |--------------------------------------------------------------------------
@@ -178,6 +179,8 @@ Route::prefix('admin')->group(function () {
         Route::get('/tariffs/edit/{id}', [TariffController::class, 'edit'])->name('admin.tariff.edit');
         Route::post('/tariffs/update/{id}', [TariffController::class, 'update'])->name('admin.tariff.update');
         Route::delete('/tariffs/delete/{id}', [TariffController::class, 'destroy'])->name('admin.tariff.destroy');
+
+        Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('admin.activity.logs');
     });
 });
 

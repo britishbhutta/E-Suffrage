@@ -33,6 +33,12 @@
                  <span>Tariff</span>
              </a>
          </li>
+         <li class="nav-item">
+             <a class="nav-link collapsed" href="{{ route('admin.activity.logs') }}">
+                 <i class="bi bi-journal-text"></i>
+                 <span>Activity logs</span>
+             </a>
+         </li>
 
          {{-- <li class="nav-item">
              <a class="nav-link collapsed" data-bs-target="#forms-nav" data-bs-toggle="collapse" href="#">
