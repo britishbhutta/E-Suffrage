@@ -139,48 +139,49 @@ Route::middleware(['setup'])->group(function () {
             return 'Error: ' . $e->getMessage();
         }
     });
-});
+
  
-// admin side routes
+    // admin side routes
 
-Route::prefix('admin')->group(function () {
-    Route::get('/', function() {
-        return redirect()->route('admin.login');
-    });
+    Route::prefix('admin')->group(function () {
+        Route::get('/', function() {
+            return redirect()->route('admin.login');
+        });
 
-    Route::get('login', [LoginController::class, 'showLoginForm'])->name('admin.login');
-    Route::post('login', [LoginController::class, 'login'])->name('admin.login.submit');
-    Route::post('logout', [LoginController::class, 'logout'])->name('admin.logout');
+        Route::get('login', [LoginController::class, 'showLoginForm'])->name('admin.login');
+        Route::post('login', [LoginController::class, 'login'])->name('admin.login.submit');
+        Route::post('logout', [LoginController::class, 'logout'])->name('admin.logout');
 
-    Route::get('register', [RegisterController::class, 'showRegisterForm'])->name('admin.register');
-    Route::post('register', [RegisterController::class, 'register'])->name('admin.register.submit');
+        Route::get('register', [RegisterController::class, 'showRegisterForm'])->name('admin.register');
+        Route::post('register', [RegisterController::class, 'register'])->name('admin.register.submit');
 
 
-    Route::middleware(['auth', AdminMiddleware::class])->group(function () {
-        Route::get('dashboard', [HomeController::class, 'index'])->name('admin.dashboard');
-        Route::get('users', [UserController::class, 'getUsers'])->name('admin.user');
-        Route::post('/admin/user/delete', [UserController::class, 'deleteUser'])->name('admin.user.delete');
+        Route::middleware(['auth', AdminMiddleware::class])->group(function () {
+            Route::get('dashboard', [HomeController::class, 'index'])->name('admin.dashboard');
+            Route::get('users', [UserController::class, 'getUsers'])->name('admin.user');
+            Route::post('/admin/user/delete', [UserController::class, 'deleteUser'])->name('admin.user.delete');
 
-        // get creator
-        Route::get('/creators', [CreaterController::class, 'index'])->name('admin.creators.index');
-        Route::get('/creators/booking/{id}', [CreaterController::class, 'showBookingPoll'])->name('admin.creators.booking.show');
+            // get creator
+            Route::get('/creators', [CreaterController::class, 'index'])->name('admin.creators.index');
+            Route::get('/creators/booking/{id}', [CreaterController::class, 'showBookingPoll'])->name('admin.creators.booking.show');
 
-        Route::get('/voters', [VoterController::class, 'index'])->name('admin.voters.index');
-        Route::get('/voters/{id}/history', [VoterController::class, 'voterHistory'])->name('admin.voters.history');
+            Route::get('/voters', [VoterController::class, 'index'])->name('admin.voters.index');
+            Route::get('/voters/{id}/history', [VoterController::class, 'voterHistory'])->name('admin.voters.history');
 
-        Route::get('/edit-profile', [AdminProfileController::class, 'edit'])->name('admin.profile.edit');
-        Route::post('/edit-profile', [AdminProfileController::class, 'update'])->name('admin.profile.update');
+            Route::get('/edit-profile', [AdminProfileController::class, 'edit'])->name('admin.profile.edit');
+            Route::post('/edit-profile', [AdminProfileController::class, 'update'])->name('admin.profile.update');
 
-        // add Tariff
-        Route::get('/add-tariff', [TariffController::class, 'create'])->name('admin.tariff.create');
-        Route::post('/add-tariff', [TariffController::class, 'store'])->name('admin.tariff.store');
-        // get Tariff
-        Route::get('/tariffs', [TariffController::class, 'index'])->name('admin.tariff.index');
-        Route::get('/tariffs/edit/{id}', [TariffController::class, 'edit'])->name('admin.tariff.edit');
-        Route::post('/tariffs/update/{id}', [TariffController::class, 'update'])->name('admin.tariff.update');
-        Route::delete('/tariffs/delete/{id}', [TariffController::class, 'destroy'])->name('admin.tariff.destroy');
+            // add Tariff
+            Route::get('/add-tariff', [TariffController::class, 'create'])->name('admin.tariff.create');
+            Route::post('/add-tariff', [TariffController::class, 'store'])->name('admin.tariff.store');
+            // get Tariff
+            Route::get('/tariffs', [TariffController::class, 'index'])->name('admin.tariff.index');
+            Route::get('/tariffs/edit/{id}', [TariffController::class, 'edit'])->name('admin.tariff.edit');
+            Route::post('/tariffs/update/{id}', [TariffController::class, 'update'])->name('admin.tariff.update');
+            Route::delete('/tariffs/delete/{id}', [TariffController::class, 'destroy'])->name('admin.tariff.destroy');
 
-        Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('admin.activity.logs');
+            Route::get('/activity-logs', [ActivityLogController::class, 'index'])->name('admin.activity.logs');
+        });
     });
 });
 
