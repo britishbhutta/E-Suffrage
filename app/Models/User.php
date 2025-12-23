@@ -14,7 +14,7 @@ class User extends Authenticatable
     // role constants (match your migration: 1 = Voter, 2 = Creator)
     public const ROLE_VOTER = 1;
     public const ROLE_CREATOR = 2;
-    public const ROLE_CREATOR_MEDIA_AD = 3;
+    public const ROLE_ADMIN = 3;
 
     protected $fillable = [
         'first_name',

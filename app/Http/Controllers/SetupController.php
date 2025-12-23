@@ -124,7 +124,28 @@ public function createDatabase(Request $request)
             '--database' => 'temp',
         ]);
 
+        
+
+        \Artisan::call('db:seed', [
+            '--class' => 'CountrySeeder',
+            '--database' => 'temp',
+            '--force' => true,
+        ]);
+
+        \Artisan::call('db:seed', [
+            '--class' => 'DatabaseSeeder',
+            '--database' => 'temp',
+            '--force' => true,
+        ]);
+
+        \Artisan::call('db:seed', [
+            '--class' => 'TariffSeeder',
+            '--database' => 'temp',
+            '--force' => true,
+        ]);
+
         $output = \Artisan::output();
+
 
         return response()->json([
             'success' => true,
