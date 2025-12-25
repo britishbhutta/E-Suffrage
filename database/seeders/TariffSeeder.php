@@ -9,11 +9,11 @@ class TariffSeeder extends Seeder
 {
     public function run(): void
     {
-        $features = json_encode([
+        $features = [
             'Event Creation',
             'Generate A Link For Voting',
             'E-mails Of Voting Participants For Download In .CSV Format'
-        ]);
+        ];
 
         Tariff::create([
             'title' => 'Tariff Small',
